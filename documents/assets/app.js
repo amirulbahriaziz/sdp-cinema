@@ -78,7 +78,10 @@ async function loadPage(slug) {
       await mermaid.run({ nodes: diagrams });
     }
     // Syntax-highlight the remaining (non-mermaid) code blocks.
-    content.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+    // Syntax highlighting is cosmetic — never let a missing/failed hljs blank the page.
+    if (typeof hljs !== 'undefined') {
+      content.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+    }
     content.scrollTop = 0;
     window.scrollTo(0, 0);
   } catch (err) {
