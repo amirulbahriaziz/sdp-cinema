@@ -7,7 +7,7 @@
  */
 import { create } from 'zustand';
 
-import type { PaymentMethod, Seat } from '../data/types';
+import type { PaymentMethod, Seat, Showtime } from '../data/types';
 
 export type BookingStep = 'seats' | 'food' | 'summary' | 'payment' | 'confirmation';
 
@@ -33,6 +33,9 @@ export interface BookingTotals {
 interface BookingState {
   step: BookingStep;
   showtimeId: number | null;
+  /** Snapshot of the chosen showtime (cinema/hall/time/tier) so later steps render it
+   *  without re-fetching. Server truth still wins on confirm. */
+  showtime: Showtime | null;
   seats: DraftSeat[];
   /** food_item_id -> { qty, unitPrice } (unitPrice = discount_price ?? price). */
   food: Record<number, { qty: number; unitPrice: number }>;
@@ -41,6 +44,8 @@ interface BookingState {
 
   setStep: (step: BookingStep) => void;
   startBooking: (showtimeId: number) => void;
+  /** Enter the booking flow for a concrete showtime; resets the draft when the showtime changes. */
+  beginBooking: (showtime: Showtime) => void;
   toggleSeat: (seat: DraftSeat) => void;
   isSeatSelected: (seatCode: string) => boolean;
   setFoodQty: (foodItemId: number, qty: number, unitPrice: number) => void;
@@ -54,6 +59,7 @@ interface BookingState {
 const initial = {
   step: 'seats' as BookingStep,
   showtimeId: null as number | null,
+  showtime: null as Showtime | null,
   seats: [] as DraftSeat[],
   food: {} as Record<number, { qty: number; unitPrice: number }>,
   promoCode: null as string | null,
@@ -70,6 +76,13 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       get().showtimeId === showtimeId
         ? { showtimeId }
         : { ...initial, showtimeId }, // new showtime -> fresh draft
+    ),
+
+  beginBooking: (showtime) =>
+    set(
+      get().showtimeId === showtime.id
+        ? { showtimeId: showtime.id, showtime }
+        : { ...initial, showtimeId: showtime.id, showtime }, // new showtime -> fresh draft
     ),
 
   toggleSeat: (seat) =>

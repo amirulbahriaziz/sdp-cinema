@@ -10,6 +10,8 @@ import { colors, space } from '../theme';
 
 interface ScreenProps {
   children: ReactNode;
+  /** Fixed header (e.g. StepHeader) above the scroll area. */
+  header?: ReactNode;
   /** Render content inside a ScrollView (default true). */
   scroll?: boolean;
   /** Sticky bottom bar (e.g. PrimaryButton / PriceTotalBar) outside the scroll area. */
@@ -19,10 +21,11 @@ interface ScreenProps {
   contentStyle?: ViewStyle;
 }
 
-export function Screen({ children, scroll = true, footer, padded = true, contentStyle }: ScreenProps) {
+export function Screen({ children, header, scroll = true, footer, padded = true, contentStyle }: ScreenProps) {
   const inner = padded ? [styles.padded, contentStyle] : contentStyle;
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      {header}
       {scroll ? (
         <ScrollView
           style={styles.flex}

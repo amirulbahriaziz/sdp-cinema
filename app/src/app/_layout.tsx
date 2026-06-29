@@ -27,6 +27,9 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="movie/[id]" />
           <Stack.Screen name="booking/[movieId]" />
+          <Stack.Screen name="booking/seats/[showtimeId]" />
+          <Stack.Screen name="booking/food/[showtimeId]" />
+          <Stack.Screen name="booking/summary/[showtimeId]" />
         </Stack>
       </ThemeProvider>
     </AppProviders>
