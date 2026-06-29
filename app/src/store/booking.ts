@@ -7,7 +7,13 @@
  */
 import { create } from 'zustand';
 
-import type { PaymentMethod, Seat, Showtime } from '../data/types';
+import type {
+  BookingRequest,
+  BookingResult,
+  PaymentMethod,
+  Seat,
+  Showtime,
+} from '../data/types';
 
 export type BookingStep = 'seats' | 'food' | 'summary' | 'payment' | 'confirmation';
 
@@ -41,6 +47,9 @@ interface BookingState {
   food: Record<number, { qty: number; unitPrice: number }>;
   promoCode: string | null;
   paymentMethod: PaymentMethod;
+  /** The confirmed booking returned by the API (or mock) after checkout — read by the
+   *  confirmation screen. Null until a successful `POST /bookings`. */
+  result: BookingResult | null;
 
   setStep: (step: BookingStep) => void;
   startBooking: (showtimeId: number) => void;
@@ -53,6 +62,7 @@ interface BookingState {
   decFood: (foodItemId: number) => void;
   setPromoCode: (code: string | null) => void;
   setPaymentMethod: (method: PaymentMethod) => void;
+  setResult: (result: BookingResult | null) => void;
   reset: () => void;
 }
 
@@ -64,6 +74,7 @@ const initial = {
   food: {} as Record<number, { qty: number; unitPrice: number }>,
   promoCode: null as string | null,
   paymentMethod: 'card' as PaymentMethod,
+  result: null as BookingResult | null,
 };
 
 export const useBookingStore = create<BookingState>((set, get) => ({
@@ -124,6 +135,8 @@ export const useBookingStore = create<BookingState>((set, get) => ({
 
   setPaymentMethod: (method) => set({ paymentMethod: method }),
 
+  setResult: (result) => set({ result }),
+
   reset: () => set({ ...initial }),
 }));
 
@@ -140,4 +153,23 @@ export const selectTotals = (s: BookingState): BookingTotals => {
   const discount = Math.round(subtotal * promoRate);
   const total = subtotal + foodTotal + serviceCharge - discount;
   return { subtotal, foodTotal, serviceCharge, discount, total };
+};
+
+/**
+ * Map the draft into the `POST /bookings` request body (CONTRACT §12). Seat codes + F&B
+ * quantities + promo + chosen method; the server recomputes all money. `food`/`promo_code`
+ * are omitted when empty so the payload stays minimal.
+ */
+export const selectBookingRequest = (s: BookingState): BookingRequest => {
+  const food = Object.entries(s.food).map(([id, f]) => ({
+    food_item_id: Number(id),
+    qty: f.qty,
+  }));
+  return {
+    showtime_id: s.showtimeId!,
+    seat_codes: s.seats.map((x) => x.seat_code),
+    payment_method: s.paymentMethod,
+    ...(food.length ? { food } : {}),
+    ...(s.promoCode ? { promo_code: s.promoCode } : {}),
+  };
 };

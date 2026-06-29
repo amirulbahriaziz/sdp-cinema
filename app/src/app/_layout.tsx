@@ -30,6 +30,9 @@ export default function RootLayout() {
           <Stack.Screen name="booking/seats/[showtimeId]" />
           <Stack.Screen name="booking/food/[showtimeId]" />
           <Stack.Screen name="booking/summary/[showtimeId]" />
+          <Stack.Screen name="booking/payment/[showtimeId]" />
+          <Stack.Screen name="booking/card/[showtimeId]" />
+          <Stack.Screen name="booking/confirmation/[showtimeId]" />
         </Stack>
       </ThemeProvider>
     </AppProviders>
