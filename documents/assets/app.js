@@ -29,16 +29,10 @@ mermaid.initialize({
   },
 });
 
-// Render ```mermaid blocks as Mermaid divs; everything else stays a code block.
-const renderer = new marked.Renderer();
-const baseCode = renderer.code.bind(renderer);
-renderer.code = function (code, lang) {
-  if (lang === 'mermaid') {
-    return `<div class="mermaid">${code}</div>`;
-  }
-  return baseCode(code, lang);
-};
-marked.setOptions({ renderer, gfm: true, breaks: false });
+// marked's renderer signature differs across versions (v12 passes a token object, not
+// (code, lang)), so we promote ```mermaid fences in the DOM after parsing (see loadPage)
+// instead of via a custom renderer — version-independent and robust.
+marked.setOptions({ gfm: true, breaks: false });
 
 function buildSidebar() {
   const nav = document.getElementById('sidebar');
@@ -70,15 +64,21 @@ async function loadPage(slug) {
     const md = await res.text();
     content.innerHTML = marked.parse(md);
 
-    // Draw any Mermaid diagrams on the page.
+    // Promote ```mermaid code blocks to <div class="mermaid"> (independent of marked's version).
+    content.querySelectorAll('code.language-mermaid').forEach((code) => {
+      const div = document.createElement('div');
+      div.className = 'mermaid';
+      div.textContent = code.textContent;
+      (code.closest('pre') || code).replaceWith(div);
+    });
+
+    // Draw any Mermaid diagrams (ERD, seat state machine, booking flow).
     const diagrams = content.querySelectorAll('.mermaid');
     if (diagrams.length) {
       await mermaid.run({ nodes: diagrams });
     }
-    // Syntax-highlight non-mermaid code blocks.
-    content.querySelectorAll('pre code').forEach((block) => {
-      if (!block.closest('.mermaid')) hljs.highlightElement(block);
-    });
+    // Syntax-highlight the remaining (non-mermaid) code blocks.
+    content.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
     content.scrollTop = 0;
     window.scrollTo(0, 0);
   } catch (err) {
