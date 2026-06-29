@@ -60,7 +60,7 @@ export function useSeatMap(showtimeId: number, opts?: { socketConnected?: boolea
     queryKey: queryKeys.seatMap(showtimeId),
     queryFn: () => data.getSeatMap(showtimeId),
     enabled: showtimeId > 0,
-    refetchInterval: socketConnected ? false : 5000,
+    refetchInterval: socketConnected ? 15000 : 5000,
   });
 }
 
