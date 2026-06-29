@@ -13,7 +13,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { PaymentMethodRow, PriceTotalBar, Screen, StepHeader } from '@/components';
 import type { PaymentMethod } from '@/data/types';
 import { useCheckout } from '@/lib/checkout';
-import { selectTotals, useBookingStore } from '@/store/booking';
+import { useBookingStore, useBookingTotals } from '@/store/booking';
 import { colors, formatMoney, space, type as typeScale } from '@/theme';
 
 const METHODS: {
@@ -36,7 +36,7 @@ export default function PaymentMethodScreen() {
   const seats = useBookingStore((s) => s.seats);
   const paymentMethod = useBookingStore((s) => s.paymentMethod);
   const setPaymentMethod = useBookingStore((s) => s.setPaymentMethod);
-  const totals = useBookingStore(selectTotals);
+  const totals = useBookingTotals();
 
   const currency = showtime?.tier.currency ?? 'RM';
   const { pay, isPending, isError } = useCheckout();

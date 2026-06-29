@@ -6,6 +6,7 @@
  * recomputes them server-side on confirm (CONTRACT §12). All money is integer minor units.
  */
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 
 import type {
   BookingRequest,
@@ -154,6 +155,13 @@ export const selectTotals = (s: BookingState): BookingTotals => {
   const total = subtotal + foodTotal + serviceCharge - discount;
   return { subtotal, foodTotal, serviceCharge, discount, total };
 };
+
+/**
+ * Subscribe to advisory totals with shallow equality. `selectTotals` returns a fresh object each
+ * call, so a raw `useBookingStore(selectTotals)` would re-render forever (Object.is sees a new ref
+ * every render). useShallow compares field-by-field.
+ */
+export const useBookingTotals = (): BookingTotals => useBookingStore(useShallow(selectTotals));
 
 /**
  * Map the draft into the `POST /bookings` request body (CONTRACT §12). Seat codes + F&B

@@ -12,7 +12,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFoodItems, useMovie } from '@/api/hooks';
 import { PrimaryButton, Screen, StepHeader, SummaryRow } from '@/components';
 import { formatDateShort, formatTime } from '@/lib/datetime';
-import { selectTotals, useBookingStore } from '@/store/booking';
+import { useBookingStore, useBookingTotals } from '@/store/booking';
 import { colors, formatMoney, radius, space, type as typeScale } from '@/theme';
 
 export default function BookingSummaryScreen() {
@@ -25,7 +25,7 @@ export default function BookingSummaryScreen() {
   const food = useBookingStore((s) => s.food);
   const promoCode = useBookingStore((s) => s.promoCode);
   const setPromoCode = useBookingStore((s) => s.setPromoCode);
-  const totals = useBookingStore(selectTotals);
+  const totals = useBookingTotals();
 
   const currency = showtime?.tier.currency ?? 'RM';
   const { data: movie } = useMovie(showtime?.movie_id ?? 0);

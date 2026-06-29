@@ -11,7 +11,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { PriceTotalBar, Screen, StepHeader } from '@/components';
 import { useCheckout } from '@/lib/checkout';
-import { selectTotals, useBookingStore } from '@/store/booking';
+import { useBookingStore, useBookingTotals } from '@/store/booking';
 import { colors, radius, space, type as typeScale } from '@/theme';
 
 /** Group digits into 4s for display: "4111111111111111" -> "4111 1111 1111 1111". */
@@ -32,7 +32,7 @@ export default function CardPaymentScreen() {
   const router = useRouter();
   const goBack = useSafeBack();
   const showtime = useBookingStore((s) => s.showtime);
-  const totals = useBookingStore(selectTotals);
+  const totals = useBookingTotals();
   const currency = showtime?.tier.currency ?? 'RM';
 
   const { pay, isPending, isError } = useCheckout();
