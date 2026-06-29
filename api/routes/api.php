@@ -1,17 +1,25 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\CinemaController;
 use App\Http\Controllers\Api\FoodItemController;
 use App\Http\Controllers\Api\MovieController;
 use App\Http\Controllers\Api\SeatLockController;
 use App\Http\Controllers\Api\ShowtimeController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+/*
+ * Auth (Step 4). Stateless Sanctum bearer tokens — register/login mint a token,
+ * logout revokes the one used on the request. Validation + authorization live in
+ * the Form Requests; credential logic in AuthService.
+ */
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::get('/auth/me', [AuthController::class, 'me']);
+});
 
 /*
  * Public read endpoints (Step 2).
