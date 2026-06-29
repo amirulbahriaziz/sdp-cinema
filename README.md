@@ -151,7 +151,7 @@ cp .env.example .env
 # Base URL of the Laravel API (no trailing slash).
 # iOS simulator / web: 127.0.0.1 is fine.
 # Android emulator: use http://10.0.2.2:8000
-# Physical device: use your machine's LAN IP, e.g. http://192.168.1.20:8000
+# Physical device: use your Mac's LAN IP (e.g. http://192.168.100.247:8000) for BOTH lines below.
 EXPO_PUBLIC_API_URL=http://127.0.0.1:8000
 
 # Data source: `live` (HTTP → Laravel) or `mock` (bundled JSON). Default: mock.
@@ -174,11 +174,15 @@ The source is read from `EXPO_PUBLIC_DATA_SOURCE` in `app/.env`:
 
 - **`mock`** — reads bundled `app/mock/*.json`, no network, fully offline. (The seat map is static —
   real-time locking is a live-only feature.)
-- **`live`** — calls the Laravel API; on any network failure it transparently falls back to `mock`.
+- **`live`** — calls the Laravel API. **Strictly live: failures surface to the UI; it does NOT
+  silently fall back to mock.** (Default when `EXPO_PUBLIC_DATA_SOURCE` is unset is `mock`.)
 
 Edit the value in `.env`, then **restart Expo** (stop and re-run `npx expo start`) so the new value is
-inlined. Genuine API responses (404 / 409 / 422) are *not* swallowed by the fallback — only
-unreachable-network errors retry against `mock`.
+inlined.
+
+**Physical device:** set `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_REVERB_HOST` to your Mac's LAN IP
+(e.g. `192.168.100.247`), run `php artisan serve --host=0.0.0.0` and `php artisan reverb:start`,
+keep phone + Mac on the same Wi-Fi, and allow the macOS firewall prompt for `php`.
 
 ### Demo: real-time seat lock across two clients
 
