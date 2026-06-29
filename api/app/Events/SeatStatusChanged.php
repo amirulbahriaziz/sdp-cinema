@@ -7,6 +7,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Fired on every seat-state transition for a showtime (lock / release / confirm).
@@ -36,6 +38,29 @@ class SeatStatusChanged implements ShouldBroadcastNow
         public string $seatCode,
         public string $status,
     ) {}
+
+    /**
+     * Best-effort realtime announce. The seat-state transition has ALREADY been
+     * durably committed to the DB (the source of truth) by the time we get here;
+     * the broadcast is a side-effect. Because we broadcast NOW (inline, no queue
+     * worker), a Reverb outage would otherwise bubble a BroadcastException up and
+     * 500 a request whose DB write already succeeded — desyncing the client from
+     * a hold/booking that really happened. So we swallow + log broadcast failures:
+     * realtime degrades to the client's polling fallback, the API stays correct.
+     */
+    public static function announce(int $showtimeId, string $seatCode, string $status): void
+    {
+        try {
+            self::dispatch($showtimeId, $seatCode, $status);
+        } catch (Throwable $e) {
+            Log::warning('SeatStatusChanged broadcast failed (realtime degraded to polling).', [
+                'showtime_id' => $showtimeId,
+                'seat_code' => $seatCode,
+                'status' => $status,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 
     /**
      * The per-showtime channel every seat event rides on.

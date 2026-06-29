@@ -70,7 +70,7 @@ class SeatLockService
 
         $lock->setRelation('seat', $seat);
 
-        SeatStatusChanged::dispatch($showtime->id, $seat->seat_code, 'held');
+        SeatStatusChanged::announce($showtime->id, $seat->seat_code, 'held');
 
         return $lock;
     }
@@ -105,7 +105,7 @@ class SeatLockService
 
         $lock->delete();
 
-        SeatStatusChanged::dispatch($showtime->id, $seat->seat_code, 'available');
+        SeatStatusChanged::announce($showtime->id, $seat->seat_code, 'available');
 
         return $seat;
     }

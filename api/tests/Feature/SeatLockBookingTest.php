@@ -14,8 +14,11 @@ use App\Models\SeatLock;
 use App\Models\SeatTypePrice;
 use App\Models\Showtime;
 use App\Models\User;
+use Illuminate\Broadcasting\BroadcastException;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Broadcast;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -154,6 +157,50 @@ class SeatLockBookingTest extends TestCase
      * inserted (priced by lookup(tier, seat.type)), holds deleted, stub payment
      * attached, totals computed server-side in integer minor units (RM).
      */
+    /**
+     * Resilience: the seat hold is committed to the DB (source of truth) BEFORE
+     * the realtime announce. Because we broadcast inline (no queue worker), a
+     * Reverb outage must NOT 500 a request whose write already succeeded — the
+     * announce is best-effort and degrades to the client's polling fallback.
+     */
+    public function test_lock_succeeds_even_when_realtime_broadcast_fails(): void
+    {
+        // A broadcaster that always throws stands in for "Reverb is down".
+        Broadcast::extend('exploding', fn () => new class implements Broadcaster
+        {
+            public function auth($request)
+            {
+                return true;
+            }
+
+            public function validAuthenticationResponse($request, $result)
+            {
+                return $result;
+            }
+
+            public function broadcast(array $channels, $event, array $payload = []): void
+            {
+                throw new BroadcastException('Reverb unreachable (simulated).');
+            }
+
+            public function resolveAuthenticatedUser($request)
+            {
+                return null;
+            }
+        });
+        config(['broadcasting.default' => 'exploding']);
+
+        $alice = User::factory()->create();
+        Sanctum::actingAs($alice);
+
+        // The hold still succeeds (201) and the row is durably in the DB.
+        $this->postJson("/api/showtimes/{$this->showtime->id}/seats/D4/lock")
+            ->assertStatus(201)
+            ->assertJsonPath('data.status', 'held');
+
+        $this->assertDatabaseCount('seat_locks', 1);
+    }
+
     public function test_confirm_booking_is_atomic_and_prices_server_side(): void
     {
         $alice = User::factory()->create();

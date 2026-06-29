@@ -153,7 +153,7 @@ class BookingService
         // socket never announces a state the DB hasn't durably reached.
         foreach ($booking->seats as $bookingSeat) {
             $bookingSeat->loadMissing('seat');
-            SeatStatusChanged::dispatch($showtime->id, $bookingSeat->seat->seat_code, 'booked');
+            SeatStatusChanged::announce($showtime->id, $bookingSeat->seat->seat_code, 'booked');
         }
 
         return $booking->load(['showtime.movie', 'showtime.hall.cinema', 'seats.seat', 'foodItems.foodItem', 'payment']);
