@@ -18,6 +18,9 @@ class ShowtimeResource extends JsonResource
             'ends_at' => $this->ends_at?->toIso8601String(),
             'movie' => new MovieResource($this->whenLoaded('movie')),
             'hall' => new HallResource($this->whenLoaded('hall')),
+            // Top-level cinema (sourced from the eager-loaded hall.cinema) to match the
+            // API contract / app shape: showtimes nest cinema directly, not under hall.
+            'cinema' => new CinemaResource($this->whenLoaded('hall', fn () => $this->hall->cinema)),
             'tier' => new PriceTierResource($this->whenLoaded('tier')),
         ];
     }
