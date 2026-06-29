@@ -25,12 +25,16 @@ export const isUsingFallback = (): boolean => usingFallback;
  * Genuine API error responses (404/409/422) are NOT swallowed — only network/unreachable
  * failures (no `error.response`) fall through, so real validation/conflict errors still surface.
  */
+type AnyFn = (...args: any[]) => Promise<any>;
+
 function withFallback(primary: DataAdapter, fallback: DataAdapter): DataAdapter {
-  const wrapped = {} as DataAdapter;
+  const wrapped: Record<string, AnyFn> = {};
   (Object.keys(primary) as (keyof DataAdapter)[]).forEach((key) => {
-    wrapped[key] = (async (...args: unknown[]) => {
+    const primaryFn = primary[key] as AnyFn;
+    const fallbackFn = fallback[key] as AnyFn;
+    wrapped[key as string] = async (...args: any[]) => {
       try {
-        const result = await (primary[key] as (...a: unknown[]) => Promise<unknown>)(...args);
+        const result = await primaryFn(...args);
         usingFallback = false;
         return result;
       } catch (err: unknown) {
@@ -38,11 +42,11 @@ function withFallback(primary: DataAdapter, fallback: DataAdapter): DataAdapter 
           typeof err === 'object' && err !== null && 'response' in err && (err as any).response;
         if (hasResponse) throw err; // real HTTP error -> let the caller handle it
         usingFallback = true;
-        return (fallback[key] as (...a: unknown[]) => Promise<unknown>)(...args);
+        return fallbackFn(...args);
       }
-    }) as DataAdapter[typeof key];
+    };
   });
-  return wrapped;
+  return wrapped as unknown as DataAdapter;
 }
 
 export const data: DataAdapter =

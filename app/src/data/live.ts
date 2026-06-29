@@ -47,7 +47,7 @@ http.interceptors.request.use((reqConfig) => {
 });
 
 /** Drop query keys whose value is null/undefined so axios omits them. */
-function params(obj?: Record<string, unknown>): Record<string, unknown> | undefined {
+function params(obj?: object): Record<string, unknown> | undefined {
   if (!obj) return undefined;
   return Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
 }

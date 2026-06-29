@@ -1,15 +1,22 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { DarkTheme, ThemeProvider } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
+import { AppProviders } from '@/api/provider';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+/**
+ * Root layout. Mounts app-wide providers (React Query + safe-area) over the navigator and
+ * forces the dark theme — SDP Cinema is dark-only (see ui-context.md).
+ */
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <AppProviders>
+      <ThemeProvider value={DarkTheme}>
+        <StatusBar style="light" />
+        <AnimatedSplashOverlay />
+        <AppTabs />
+      </ThemeProvider>
+    </AppProviders>
   );
 }
