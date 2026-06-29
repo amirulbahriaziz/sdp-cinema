@@ -51,12 +51,16 @@ export function useShowtimes(query?: ShowtimeQuery) {
   });
 }
 
-export function useSeatMap(showtimeId: number) {
+export function useSeatMap(showtimeId: number, opts?: { socketConnected?: boolean }) {
+  // Polling is the realtime fallback: while the Reverb socket is connected, live
+  // `SeatStatusChanged` events patch the cache directly, so we stop polling. The moment
+  // the socket drops (`socketConnected` false), polling resumes and re-converges the grid.
+  const socketConnected = opts?.socketConnected ?? false;
   return useQuery({
     queryKey: queryKeys.seatMap(showtimeId),
     queryFn: () => data.getSeatMap(showtimeId),
     enabled: showtimeId > 0,
-    refetchInterval: 5000, // polling fallback for dropped realtime socket
+    refetchInterval: socketConnected ? false : 5000,
   });
 }
 

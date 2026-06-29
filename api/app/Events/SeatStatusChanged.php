@@ -4,7 +4,7 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -18,8 +18,13 @@ use Illuminate\Queue\SerializesModels;
  * Channel: a public per-showtime channel `showtime.{id}`; the Expo client
  * subscribes via laravel-echo + pusher-js (Reverb protocol) and patches its
  * React Query seat-map cache.
+ *
+ * Broadcasts NOW (synchronously, in the request) rather than via the queue: the
+ * local stack runs no queue worker (no Redis, DB-backed queue), so an inline
+ * broadcast guarantees seat events reach Reverb the instant a lock/release/booking
+ * commits — without a separate `queue:work` process to keep alive for the demo.
  */
-class SeatStatusChanged implements ShouldBroadcast
+class SeatStatusChanged implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

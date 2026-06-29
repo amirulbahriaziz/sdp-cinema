@@ -4,16 +4,21 @@
  * `selected`. Tapping an available seat toggles it in the booking draft and updates the
  * SUB-TOTAL (integer minor units, RM). Booked/held seats are non-interactive.
  *
- * The seat map is read through React Query (`useSeatMap`, with a polling fallback). FCFS
- * server-side locking is wired in the realtime slice; here selection is draft-local.
+ * Realtime: `useSeatChannel` subscribes to the showtime's Reverb channel and patches the
+ * React Query seat-map cache on every broadcast, so other clients' holds/bookings appear
+ * live; `useSeatMap` polls only while that socket is down (fallback). In live mode a tap
+ * also acquires/releases the FCFS server lock — the loser of a race gets a 409 and the
+ * optimistic selection rolls back.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 
-import { useSeatMap } from '@/api/hooks';
+import { useLockSeat, useReleaseSeat, useSeatMap } from '@/api/hooks';
 import { PriceTotalBar, Screen, SeatLegend, SeatMap, StepHeader } from '@/components';
+import { isLiveSource } from '@/data';
 import type { Seat } from '@/data/types';
+import { useSeatChannel } from '@/realtime/use-seat-channel';
 import { useBookingStore } from '@/store/booking';
 import { colors, space, type as typeScale } from '@/theme';
 
@@ -32,13 +37,40 @@ export default function SeatSelectionScreen() {
     if (draftShowtimeId !== showtimeId) startBooking(showtimeId);
   }, [draftShowtimeId, showtimeId, startBooking]);
 
-  const { data: seatMap, isLoading, isError } = useSeatMap(showtimeId);
+  // Realtime channel patches the seat-map cache; while it is connected, stop polling.
+  const { connected } = useSeatChannel(showtimeId);
+  const { data: seatMap, isLoading, isError } = useSeatMap(showtimeId, {
+    socketConnected: connected,
+  });
+
+  const lockSeat = useLockSeat(showtimeId);
+  const releaseSeat = useReleaseSeat(showtimeId);
 
   const selectedCodes = useMemo(() => seats.map((s) => s.seat_code), [seats]);
   const subtotal = useMemo(() => seats.reduce((sum, s) => sum + s.price, 0), [seats]);
 
-  const onToggleSeat = (seat: Seat) =>
-    toggleSeat({ seat_code: seat.seat_code, type: seat.type, price: seat.price });
+  const onToggleSeat = (seat: Seat) => {
+    const wasSelected = selectedCodes.includes(seat.seat_code);
+    const draftSeat = { seat_code: seat.seat_code, type: seat.type, price: seat.price };
+
+    // Optimistic: flip the draft immediately so the UI feels instant.
+    toggleSeat(draftSeat);
+
+    if (!isLiveSource) return; // mock mode: draft-local only, no server lock.
+
+    if (wasSelected) {
+      // Deselect -> release the FCFS hold (TTL would also free it; release is immediate).
+      releaseSeat.mutate(seat.seat_code);
+    } else {
+      // Select -> acquire the FCFS hold; the loser of a race rolls the selection back.
+      lockSeat.mutate(seat.seat_code, {
+        onError: () => {
+          toggleSeat(draftSeat); // undo the optimistic add
+          Alert.alert('Seat unavailable', 'Someone just took that seat. Please pick another.');
+        },
+      });
+    }
+  };
 
   return (
     <Screen
