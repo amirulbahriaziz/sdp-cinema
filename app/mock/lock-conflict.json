@@ -1,0 +1,6 @@
+{
+  "message": "Seat is no longer available.",
+  "errors": {
+    "seat": ["This seat is already held or booked."]
+  }
+}

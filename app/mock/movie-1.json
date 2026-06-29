@@ -1,0 +1,48 @@
+{
+  "data": {
+    "id": 1,
+    "title": "Venom: The Last Dance",
+    "synopsis": "Eddie Brock and Venom are on the run. Hunted by both of their worlds and with the net closing in, the duo are forced into a devastating decision that will bring the curtain down on their symbiotic relationship.",
+    "duration_min": 109,
+    "release_date": "2026-06-12",
+    "age_rating": "P13",
+    "imdb_rating": 7.1,
+    "poster_url": "https://image.tmdb.org/t/p/w500/aosm8NMQ3UyoBVpSxyimorCQykC.jpg",
+    "trailer_url": "https://www.youtube.com/watch?v=__2bjWbetsB8",
+    "genres": ["Action", "Sci-Fi", "Adventure"],
+    "director": "Kelly Marcel",
+    "casts": ["Tom Hardy", "Chiwetel Ejiofor", "Juno Temple", "Rhys Ifans"],
+    "writers": ["Kelly Marcel", "Tom Hardy"],
+    "rating_summary": {
+      "average": 4.2,
+      "count": 128,
+      "breakdown": { "5": 70, "4": 35, "3": 15, "2": 5, "1": 3 }
+    },
+    "reviews": [
+      {
+        "id": 10,
+        "user_name": "Sofia Rahman",
+        "rating": 5,
+        "title": "Best of the trilogy",
+        "body": "The chemistry between Eddie and Venom carries the whole film. Action set pieces were wild.",
+        "created_at": "2026-06-20T10:00:00+08:00"
+      },
+      {
+        "id": 11,
+        "user_name": "Daniel Lim",
+        "rating": 4,
+        "title": "Fun ride",
+        "body": "A bit messy in the middle but a satisfying send-off. Stay for the credits.",
+        "created_at": "2026-06-21T14:30:00+08:00"
+      },
+      {
+        "id": 12,
+        "user_name": "Aina Yusof",
+        "rating": 3,
+        "title": "Okay-lah",
+        "body": "Enjoyable but predictable. The CGI was great though.",
+        "created_at": "2026-06-22T19:12:00+08:00"
+      }
+    ]
+  }
+}

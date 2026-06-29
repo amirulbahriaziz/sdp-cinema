@@ -1,0 +1,32 @@
+{
+  "data": {
+    "id": 3,
+    "title": "Inside Out 2",
+    "synopsis": "Riley enters her teenage years and Headquarters undergoes a sudden demolition to make room for something new: brand-new Emotions. Joy, Sadness, Anger, Fear and Disgust must make space for Anxiety and friends.",
+    "duration_min": 96,
+    "release_date": "2026-06-19",
+    "age_rating": "U",
+    "imdb_rating": 7.6,
+    "poster_url": "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",
+    "trailer_url": "https://www.youtube.com/watch?v=LEjhY15eCx0",
+    "genres": ["Animation", "Family", "Comedy"],
+    "director": "Kelsey Mann",
+    "casts": ["Amy Poehler", "Maya Hawke", "Kensington Tallman", "Phyllis Smith"],
+    "writers": ["Meg LeFauve", "Dave Holstein"],
+    "rating_summary": {
+      "average": 4.4,
+      "count": 96,
+      "breakdown": { "5": 60, "4": 24, "3": 8, "2": 3, "1": 1 }
+    },
+    "reviews": [
+      {
+        "id": 30,
+        "user_name": "Priya Suresh",
+        "rating": 5,
+        "title": "Made me cry",
+        "body": "Anxiety is the best new character. A heartfelt look at growing up.",
+        "created_at": "2026-06-22T16:00:00+08:00"
+      }
+    ]
+  }
+}
