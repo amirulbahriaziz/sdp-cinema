@@ -20,7 +20,7 @@ export default function ConfirmationScreen() {
 
   const goHome = () => {
     reset();
-    router.dismissAll();
+    router.canDismiss() ? router.dismissAll() : router.replace('/');
   };
 
   if (!result) {

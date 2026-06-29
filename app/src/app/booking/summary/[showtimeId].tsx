@@ -5,6 +5,7 @@
  * recomputes them on confirm. "Proceed to Payment" hands off to the payment slice.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -16,6 +17,7 @@ import { colors, formatMoney, radius, space, type as typeScale } from '@/theme';
 
 export default function BookingSummaryScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const { showtimeId } = useLocalSearchParams<{ showtimeId: string }>();
 
   const showtime = useBookingStore((s) => s.showtime);
@@ -47,7 +49,7 @@ export default function BookingSummaryScreen() {
 
   return (
     <Screen
-      header={<StepHeader title="Booking Summary" onBack={() => router.back()} />}
+      header={<StepHeader title="Booking Summary" onBack={goBack} />}
       footer={
         <PrimaryButton
           label="Proceed to Payment"

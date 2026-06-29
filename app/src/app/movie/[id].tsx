@@ -8,6 +8,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,6 +30,7 @@ function formatRuntime(min: number): string {
 
 export default function MovieDetailScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const { id } = useLocalSearchParams<{ id: string }>();
   const movieId = Number(id);
   const [tab, setTab] = useState<TabKey>('details');
@@ -36,7 +38,7 @@ export default function MovieDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <Header onBack={() => router.back()} />
+      <Header onBack={goBack} />
 
       {isLoading ? (
         <ActivityIndicator color={colors.accent.primary} style={styles.loader} />

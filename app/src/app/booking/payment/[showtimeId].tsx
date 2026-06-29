@@ -7,6 +7,7 @@
  * dummy too, so they pay inline (checkout -> confirmation) without a second screen.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { PaymentMethodRow, PriceTotalBar, Screen, StepHeader } from '@/components';
@@ -28,6 +29,7 @@ const METHODS: {
 
 export default function PaymentMethodScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const { showtimeId } = useLocalSearchParams<{ showtimeId: string }>();
 
   const showtime = useBookingStore((s) => s.showtime);
@@ -52,7 +54,7 @@ export default function PaymentMethodScreen() {
 
   return (
     <Screen
-      header={<StepHeader title="Payment Method" onBack={() => router.back()} />}
+      header={<StepHeader title="Payment Method" onBack={goBack} />}
       footer={
         <PriceTotalBar
           label="Total Payable"

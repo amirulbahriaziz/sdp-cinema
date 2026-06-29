@@ -5,6 +5,7 @@
  * and routes to the confirmation screen. Card data is never sent anywhere.
  */
 import { useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -29,6 +30,7 @@ const formatExpiry = (raw: string) => {
 
 export default function CardPaymentScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const showtime = useBookingStore((s) => s.showtime);
   const totals = useBookingStore(selectTotals);
   const currency = showtime?.tier.currency ?? 'RM';
@@ -49,7 +51,7 @@ export default function CardPaymentScreen() {
 
   return (
     <Screen
-      header={<StepHeader title="Card Payment" onBack={() => router.back()} />}
+      header={<StepHeader title="Card Payment" onBack={goBack} />}
       footer={
         <PriceTotalBar
           label="Total Payable"

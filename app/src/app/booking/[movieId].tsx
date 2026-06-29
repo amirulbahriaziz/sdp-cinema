@@ -10,6 +10,7 @@
  * pushes the Seat Selection screen.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
@@ -35,6 +36,7 @@ const hallKey = (s: Showtime) => `${s.cinema.id}-${s.hall.id}`;
 
 export default function TicketBookingScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const { movieId } = useLocalSearchParams<{ movieId: string }>();
   const beginBooking = useBookingStore((s) => s.beginBooking);
   const { data: showtimes, isLoading, isError } = useShowtimes({ movie_id: Number(movieId) });
@@ -125,7 +127,7 @@ export default function TicketBookingScreen() {
 
   return (
     <Screen
-      header={<StepHeader title="Ticket Booking" onBack={() => router.back()} />}
+      header={<StepHeader title="Ticket Booking" onBack={goBack} />}
       footer={
         <PrimaryButton label="Select Seats" disabled={!selected} onPress={onProceed} />
       }>

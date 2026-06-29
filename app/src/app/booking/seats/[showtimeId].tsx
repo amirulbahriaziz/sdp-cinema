@@ -11,6 +11,7 @@
  * optimistic selection rolls back.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 
@@ -24,6 +25,7 @@ import { colors, space, type as typeScale } from '@/theme';
 
 export default function SeatSelectionScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const { showtimeId: param } = useLocalSearchParams<{ showtimeId: string }>();
   const showtimeId = Number(param);
 
@@ -74,7 +76,7 @@ export default function SeatSelectionScreen() {
 
   return (
     <Screen
-      header={<StepHeader title="Select Seats" onBack={() => router.back()} />}
+      header={<StepHeader title="Select Seats" onBack={goBack} />}
       contentStyle={styles.content}
       footer={
         <PriceTotalBar

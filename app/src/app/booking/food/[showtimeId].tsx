@@ -5,6 +5,7 @@
  * leaves the F&B selection as-is (empty if nothing was added).
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
@@ -22,6 +23,7 @@ const TABS: { value: FoodCategory; label: string }[] = [
 
 export default function FoodBeverageScreen() {
   const router = useRouter();
+  const goBack = useSafeBack();
   const { showtimeId } = useLocalSearchParams<{ showtimeId: string }>();
   const [tab, setTab] = useState<FoodCategory>('combo');
 
@@ -44,7 +46,7 @@ export default function FoodBeverageScreen() {
       header={
         <StepHeader
           title="Food & Beverage"
-          onBack={() => router.back()}
+          onBack={goBack}
           action={{ label: 'Skip', onPress: toSummary }}
         />
       }
