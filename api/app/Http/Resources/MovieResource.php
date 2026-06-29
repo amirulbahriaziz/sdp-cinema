@@ -24,11 +24,16 @@ class MovieResource extends JsonResource
             'director' => $this->director,
             'writers' => $this->writers ?? [],
             'sections' => $this->sections ?? [],
-            // Aggregates + reviews are only present on the detail endpoint.
-            'reviews_count' => $this->whenCounted('reviews'),
-            'reviews_avg' => $this->when(
-                $this->reviews_avg_rating !== null,
-                fn () => round((float) $this->reviews_avg_rating, 1)
+            // Rating summary + reviews are only present on the detail endpoint (reviews loaded).
+            'rating_summary' => $this->when(
+                $this->relationLoaded('reviews'),
+                fn () => [
+                    'average' => round((float) $this->reviews_avg_rating, 1),
+                    'count' => (int) ($this->reviews_count ?? $this->reviews->count()),
+                    'breakdown' => (object) collect([5, 4, 3, 2, 1])->mapWithKeys(fn ($s) => [
+                        (string) $s => $this->reviews->where('rating', $s)->count(),
+                    ])->all(),
+                ]
             ),
             'reviews' => MovieReviewResource::collection($this->whenLoaded('reviews')),
         ];

@@ -21,6 +21,13 @@ class ShowtimeResource extends JsonResource
             // Top-level cinema (sourced from the eager-loaded hall.cinema) to match the
             // API contract / app shape: showtimes nest cinema directly, not under hall.
             'cinema' => new CinemaResource($this->whenLoaded('hall', fn () => $this->hall->cinema)),
+            // ponytail: per-row count (N+1 across a list) — fine for the demo's few showtimes;
+            // switch to withCount on the service query if the showtime list grows large.
+            'seats_available' => $this->when(
+                $this->relationLoaded('hall'),
+                fn () => $this->hall->seats()->where('active', true)->count()
+                    - \App\Models\BookingSeat::where('showtime_id', $this->id)->count()
+            ),
             'tier' => new PriceTierResource($this->whenLoaded('tier')),
         ];
     }

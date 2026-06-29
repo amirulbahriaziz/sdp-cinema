@@ -75,29 +75,28 @@ class SeatMapService
             ->values()
             ->all();
 
+        // Contract shape (matches app/mock seat map): top-level showtime_id + currency,
+        // tier with price range, and the rows/cols the grid renders from.
+        $rows = collect($seats)->pluck('row_label')->unique()->values()->all();
+        $cols = (int) (collect($seats)->max('col_num') ?? 0);
+        $seatTypePrices = $priceByType
+            ->map(fn ($price, $type) => ['seat_type' => $type, 'price' => $price])
+            ->values()->all();
+
         return [
-            'showtime' => [
-                'id' => $showtime->id,
-                'movie_id' => $showtime->movie_id,
-                'hall_id' => $showtime->hall_id,
-                'tier_id' => $showtime->tier_id,
-                'starts_at' => $showtime->starts_at?->toIso8601String(),
-                'ends_at' => $showtime->ends_at?->toIso8601String(),
-                'cinema' => $showtime->hall->cinema ? [
-                    'id' => $showtime->hall->cinema->id,
-                    'name' => $showtime->hall->cinema->name,
-                ] : null,
-                'hall_name' => $showtime->hall->name,
-            ],
+            'showtime_id' => $showtime->id,
+            'currency' => $currency,
             'tier' => [
                 'id' => $showtime->tier->id,
                 'name' => $showtime->tier->name,
                 'currency' => $currency,
-                'prices' => $priceByType->map(fn ($price, $type) => [
-                    'seat_type' => $type,
-                    'price' => $price,
-                ])->values()->all(),
+                'price_min' => $priceByType->isNotEmpty() ? (int) $priceByType->min() : null,
+                'price_max' => $priceByType->isNotEmpty() ? (int) $priceByType->max() : null,
+                'seat_type_prices' => $seatTypePrices,
             ],
+            'rows' => $rows,
+            'cols' => $cols,
+            'seat_type_prices' => $seatTypePrices,
             'seats' => $seats,
         ];
     }

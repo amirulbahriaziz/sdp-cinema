@@ -14,7 +14,7 @@ class MovieReviewResource extends JsonResource
             'rating' => (int) $this->rating,
             'title' => $this->title,
             'body' => $this->body,
-            'author' => $this->whenLoaded('user', fn () => $this->user?->name),
+            'user_name' => $this->whenLoaded('user', fn () => $this->user?->name),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
