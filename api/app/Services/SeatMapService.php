@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\SeatStatus;
 use App\Models\BookingSeat;
 use App\Models\SeatLock;
 use App\Models\Showtime;
@@ -25,10 +26,9 @@ class SeatMapService
     {
         $showtime->loadMissing(['tier.seatTypePrices', 'hall.cinema']);
 
-        // Price lookup table: seat_type => int minor units.
+        // Price lookup table: seat_type value => int minor units (seat_type is a SeatType enum).
         $priceByType = $showtime->tier->seatTypePrices
-            ->pluck('price', 'seat_type')
-            ->map(fn ($p) => (int) $p);
+            ->mapWithKeys(fn ($p) => [$p->seat_type->value => (int) $p->price]);
 
         $currency = $showtime->tier->currency;
 
@@ -54,11 +54,11 @@ class SeatMapService
             ->get()
             ->map(function ($seat) use ($bookedSeatIds, $heldSeatIds, $priceByType, $currency) {
                 if (isset($bookedSeatIds[$seat->id])) {
-                    $status = 'booked';
+                    $status = SeatStatus::Booked;
                 } elseif (isset($heldSeatIds[$seat->id])) {
-                    $status = 'held';
+                    $status = SeatStatus::Held;
                 } else {
-                    $status = 'available';
+                    $status = SeatStatus::Available;
                 }
 
                 return [
@@ -66,9 +66,9 @@ class SeatMapService
                     'seat_code' => $seat->seat_code,
                     'row_label' => $seat->row_label,
                     'col_num' => (int) $seat->col_num,
-                    'type' => $seat->type,
-                    'status' => $status,
-                    'price' => $priceByType[$seat->type] ?? null,
+                    'type' => $seat->type->value,
+                    'status' => $status->value,
+                    'price' => $priceByType[$seat->type->value] ?? null,
                     'currency' => $currency,
                 ];
             })

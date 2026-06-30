@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Enums\SeatStatus;
 use App\Models\Showtime;
 use App\Services\SeatLockService;
 use Illuminate\Http\JsonResponse;
@@ -39,7 +40,7 @@ class SeatLockController extends Controller
             'data' => [
                 'showtime_id' => $showtime->id,
                 'seat_code' => $lock->seat->seat_code,
-                'status' => 'held',
+                'status' => SeatStatus::Held->value,
                 'holder' => 'you',
                 'expires_at' => $lock->expires_at->toIso8601String(),
                 'ttl_seconds' => SeatLockService::TTL_SECONDS,
@@ -69,7 +70,7 @@ class SeatLockController extends Controller
             'data' => [
                 'showtime_id' => $showtime->id,
                 'seat_code' => $seat->seat_code,
-                'status' => 'available',
+                'status' => SeatStatus::Available->value,
             ],
         ]);
     }

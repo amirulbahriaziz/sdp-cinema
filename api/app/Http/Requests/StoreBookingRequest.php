@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Validation + authorization for POST /bookings. Per code-standards these live
@@ -35,7 +37,7 @@ class StoreBookingRequest extends FormRequest
             'food.*.food_item_id' => ['required_with:food', 'integer', 'exists:food_items,id'],
             'food.*.qty' => ['required_with:food', 'integer', 'min:1', 'max:99'],
             'promo_code' => ['nullable', 'string', 'max:50'],
-            'payment_method' => ['required', 'string', 'in:card,bank,crypto'],
+            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
         ];
     }
 }

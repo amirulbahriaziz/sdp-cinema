@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\BookingSeat;
 use App\Models\Cinema;
@@ -239,7 +240,7 @@ class SeatLockBookingTest extends TestCase
         $this->assertDatabaseCount('seat_locks', 0);
         $this->assertSame(2, BookingSeat::where('showtime_id', $this->showtime->id)->count());
         $this->assertDatabaseHas('payments', ['amount' => 5205, 'status' => 'paid']);
-        $this->assertSame('confirmed', Booking::first()->status);
+        $this->assertSame(BookingStatus::Confirmed, Booking::first()->status);
     }
 
     public function test_cannot_confirm_a_seat_you_do_not_hold(): void

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\SeatStatus;
 use App\Events\SeatStatusChanged;
 use App\Models\BookingSeat;
 use App\Models\Seat;
@@ -70,7 +71,7 @@ class SeatLockService
 
         $lock->setRelation('seat', $seat);
 
-        SeatStatusChanged::announce($showtime->id, $seat->seat_code, 'held');
+        SeatStatusChanged::announce($showtime->id, $seat->seat_code, SeatStatus::Held);
 
         return $lock;
     }
@@ -105,7 +106,7 @@ class SeatLockService
 
         $lock->delete();
 
-        SeatStatusChanged::announce($showtime->id, $seat->seat_code, 'available');
+        SeatStatusChanged::announce($showtime->id, $seat->seat_code, SeatStatus::Available);
 
         return $seat;
     }
@@ -139,7 +140,7 @@ class SeatLockService
         foreach ($locks as $lock) {
             $code = $codes[$lock->seat_id] ?? null;
             if ($code !== null) {
-                SeatStatusChanged::announce($showtime->id, $code, 'available');
+                SeatStatusChanged::announce($showtime->id, $code, SeatStatus::Available);
                 $freed[] = $code;
             }
         }

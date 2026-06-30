@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\BookingStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Enums\SeatStatus;
 use App\Events\SeatStatusChanged;
 use App\Models\Booking;
 use App\Models\FoodItem;
@@ -67,7 +71,8 @@ class BookingService
             ->findOrFail($data['showtime_id']);
 
         // Price lookup for this showtime's tier: seat_type => int minor units.
-        $priceByType = $showtime->tier->seatTypePrices->pluck('price', 'seat_type');
+        $priceByType = $showtime->tier->seatTypePrices
+            ->mapWithKeys(fn ($p) => [$p->seat_type->value => (int) $p->price]);
         $currency = $showtime->tier->currency;
 
         $booking = DB::transaction(function () use ($user, $data, $showtime, $priceByType, $currency) {
@@ -102,7 +107,7 @@ class BookingService
 
                 $seatRows[] = [
                     'seat' => $seat,
-                    'unit_price' => (int) ($priceByType[$seat->type] ?? 0),
+                    'unit_price' => (int) ($priceByType[$seat->type->value] ?? 0),
                 ];
                 $lockIds[] = $lock->id;
             }
@@ -122,7 +127,7 @@ class BookingService
                 'user_id' => $user->id,
                 'showtime_id' => $showtime->id,
                 'reference' => 'TMP', // replaced with id-derived reference below
-                'status' => 'confirmed',
+                'status' => BookingStatus::Confirmed,
                 'subtotal' => $subtotal,
                 'service_charge' => $serviceCharge,
                 'food_total' => $foodTotal,
@@ -159,10 +164,10 @@ class BookingService
             // 8) Stub payment (no gateway) — one row per booking, marked paid.
             Payment::create([
                 'booking_id' => $booking->id,
-                'method' => $data['payment_method'],
+                'method' => PaymentMethod::from($data['payment_method']),
                 'amount' => $total,
                 'currency' => $currency,
-                'status' => 'paid',
+                'status' => PaymentStatus::Paid,
                 'reference' => sprintf('PAY-%06d', $booking->id),
             ]);
 
@@ -173,7 +178,7 @@ class BookingService
         // socket never announces a state the DB hasn't durably reached.
         foreach ($booking->seats as $bookingSeat) {
             $bookingSeat->loadMissing('seat');
-            SeatStatusChanged::announce($showtime->id, $bookingSeat->seat->seat_code, 'booked');
+            SeatStatusChanged::announce($showtime->id, $bookingSeat->seat->seat_code, SeatStatus::Booked);
         }
 
         return $booking->load(['showtime.movie', 'showtime.hall.cinema', 'seats.seat', 'foodItems.foodItem', 'payment']);

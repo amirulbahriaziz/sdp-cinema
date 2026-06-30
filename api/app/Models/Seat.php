@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SeatType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,7 @@ class Seat extends Model
     protected $fillable = ['hall_id', 'seat_code', 'row_label', 'col_num', 'type', 'active'];
 
     protected $casts = [
+        'type' => SeatType::class,
         'col_num' => 'integer',
         'active' => 'boolean',
     ];

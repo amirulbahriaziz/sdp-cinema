@@ -22,7 +22,7 @@ class BookingResource extends JsonResource
         return [
             'id' => $this->id,
             'reference' => $this->reference,
-            'status' => $this->status,
+            'status' => $this->status->value,
             'currency' => $this->currency,
             'showtime' => [
                 'id' => $this->showtime->id,
@@ -42,7 +42,7 @@ class BookingResource extends JsonResource
             ],
             'seats' => $this->seats->map(fn ($bs) => [
                 'seat_code' => $bs->seat->seat_code,
-                'type' => $bs->seat->type,
+                'type' => $bs->seat->type->value,
                 'unit_price' => (int) $bs->unit_price,
             ])->values(),
             'food' => $this->foodItems->map(fn ($bf) => [
@@ -59,10 +59,10 @@ class BookingResource extends JsonResource
             'discount' => (int) $this->discount,
             'total' => (int) $this->total,
             'payment' => $this->payment ? [
-                'method' => $this->payment->method,
+                'method' => $this->payment->method->value,
                 'amount' => (int) $this->payment->amount,
                 'currency' => $this->payment->currency,
-                'status' => $this->payment->status,
+                'status' => $this->payment->status->value,
                 'reference' => $this->payment->reference,
             ] : null,
         ];

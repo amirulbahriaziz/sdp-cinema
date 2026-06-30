@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\SeatStatus;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -30,13 +31,10 @@ class SeatStatusChanged implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @param  string  $status  available | held | booked (shared seat-status vocabulary)
-     */
     public function __construct(
         public int $showtimeId,
         public string $seatCode,
-        public string $status,
+        public SeatStatus $status,
     ) {}
 
     /**
@@ -48,7 +46,7 @@ class SeatStatusChanged implements ShouldBroadcastNow
      * a hold/booking that really happened. So we swallow + log broadcast failures:
      * realtime degrades to the client's polling fallback, the API stays correct.
      */
-    public static function announce(int $showtimeId, string $seatCode, string $status): void
+    public static function announce(int $showtimeId, string $seatCode, SeatStatus $status): void
     {
         try {
             self::dispatch($showtimeId, $seatCode, $status);
@@ -56,7 +54,7 @@ class SeatStatusChanged implements ShouldBroadcastNow
             Log::warning('SeatStatusChanged broadcast failed (realtime degraded to polling).', [
                 'showtime_id' => $showtimeId,
                 'seat_code' => $seatCode,
-                'status' => $status,
+                'status' => $status->value,
                 'error' => $e->getMessage(),
             ]);
         }
@@ -88,7 +86,7 @@ class SeatStatusChanged implements ShouldBroadcastNow
         return [
             'showtime_id' => $this->showtimeId,
             'seat_code' => $this->seatCode,
-            'status' => $this->status,
+            'status' => $this->status->value,
         ];
     }
 }

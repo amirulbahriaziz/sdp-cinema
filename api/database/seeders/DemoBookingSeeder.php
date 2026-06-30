@@ -68,7 +68,7 @@ class DemoBookingSeeder extends Seeder
         $subtotal = 0;
         foreach ($seatCodes as $code) {
             $seat = $this->seat($code);
-            $price = $prices[$seat->type];
+            $price = $prices[$seat->type->value];
             $subtotal += $price;
             $lines[] = ['seat_id' => $seat->id, 'unit_price' => $price];
         }
@@ -127,7 +127,8 @@ class DemoBookingSeeder extends Seeder
     private function priceMap(int $tierId): array
     {
         return SeatTypePrice::where('tier_id', $tierId)
-            ->pluck('price', 'seat_type')
+            ->get()
+            ->mapWithKeys(fn ($p) => [$p->seat_type->value => (int) $p->price])
             ->all();
     }
 
