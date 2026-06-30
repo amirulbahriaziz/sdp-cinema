@@ -282,4 +282,41 @@ class SeatLockBookingTest extends TestCase
         $this->postJson("/api/showtimes/{$this->showtime->id}/seats/D4/lock")
             ->assertStatus(409);
     }
+
+    public function test_cancel_releases_all_my_holds_but_not_others(): void
+    {
+        $alice = User::factory()->create();
+        $bob = User::factory()->create();
+        $st = $this->showtime->id;
+
+        Sanctum::actingAs($alice);
+        $this->postJson("/api/showtimes/{$st}/seats/D4/lock")->assertStatus(201);
+        $this->postJson("/api/showtimes/{$st}/seats/D5/lock")->assertStatus(201);
+
+        Sanctum::actingAs($bob);
+        $this->postJson("/api/showtimes/{$st}/seats/D6/lock")->assertStatus(201);
+
+        // Alice cancels the in-progress booking → her two holds freed, Bob's D6 stays.
+        Sanctum::actingAs($alice);
+        $this->deleteJson("/api/showtimes/{$st}/holds")
+            ->assertStatus(200)
+            ->assertJsonPath('data.showtime_id', $st)
+            ->assertJsonCount(2, 'data.released');
+
+        $this->assertDatabaseCount('seat_locks', 1);
+        $this->assertDatabaseHas('seat_locks', [
+            'seat_id' => Seat::where('seat_code', 'D6')->first()->id,
+        ]);
+
+        // Idempotent — cancelling again with nothing held returns an empty list.
+        $this->deleteJson("/api/showtimes/{$st}/holds")
+            ->assertStatus(200)
+            ->assertJsonCount(0, 'data.released');
+    }
+
+    public function test_cancel_holds_requires_authentication(): void
+    {
+        $this->deleteJson("/api/showtimes/{$this->showtime->id}/holds")
+            ->assertStatus(401);
+    }
 }

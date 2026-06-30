@@ -87,6 +87,15 @@ export function useReleaseSeat(showtimeId: number) {
   });
 }
 
+/** Cancel the in-progress booking — release all of the user's holds for the showtime. */
+export function useCancelHolds(showtimeId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => data.cancelHolds(showtimeId),
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.seatMap(showtimeId) }),
+  });
+}
+
 export function useCreateBooking() {
   return useMutation({
     mutationFn: (payload: BookingRequest) => data.createBooking(payload),

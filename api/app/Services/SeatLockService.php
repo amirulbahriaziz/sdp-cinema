@@ -111,6 +111,43 @@ class SeatLockService
     }
 
     /**
+     * Release every active hold the caller owns for a showtime — the "cancel the
+     * in-progress booking" action. Frees each seat and broadcasts `available` so
+     * other clients see them reopen live. No-op (returns []) when nothing is held.
+     *
+     * @return array<int, string> the freed seat codes
+     */
+    public function releaseAll(Showtime $showtime, User $holder): array
+    {
+        $locks = SeatLock::query()
+            ->where('showtime_id', $showtime->id)
+            ->where('holder_id', $holder->id)
+            ->where('expires_at', '>', Carbon::now())
+            ->get();
+
+        if ($locks->isEmpty()) {
+            return [];
+        }
+
+        $codes = Seat::query()
+            ->whereIn('id', $locks->pluck('seat_id'))
+            ->pluck('seat_code', 'id');
+
+        SeatLock::query()->whereIn('id', $locks->pluck('id'))->delete();
+
+        $freed = [];
+        foreach ($locks as $lock) {
+            $code = $codes[$lock->seat_id] ?? null;
+            if ($code !== null) {
+                SeatStatusChanged::announce($showtime->id, $code, 'available');
+                $freed[] = $code;
+            }
+        }
+
+        return $freed;
+    }
+
+    /**
      * Delete every expired hold across all showtimes. Wired to a scheduled
      * command (`seatlocks:prune`); the seat-map read path also filters by
      * `expires_at`, so an abandoned hold can never block a seat indefinitely.

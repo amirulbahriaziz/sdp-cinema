@@ -92,6 +92,13 @@ export const liveAdapter: DataAdapter = {
     return res.data.data;
   },
 
+  async cancelHolds(showtimeId: number) {
+    const res = await http.delete<{ data: { showtime_id: number; released: string[] } }>(
+      `/showtimes/${showtimeId}/holds`,
+    );
+    return { released: res.data.data.released };
+  },
+
   async getFoodItems(query?: FoodQuery) {
     const res = await http.get<{ data: FoodItem[] }>('/food-items', { params: params(query) });
     return res.data.data;

@@ -106,6 +106,11 @@ export const mockAdapter: DataAdapter = {
     });
   },
 
+  cancelHolds(): Promise<{ released: string[] }> {
+    // Mock has no real holds — the draft reset in the UI handles the visual.
+    return delay({ released: [] });
+  },
+
   releaseSeat(showtimeId: number, seatCode: string): Promise<LockResult> {
     return delay({ showtime_id: showtimeId, seat_code: seatCode, status: 'available' });
   },

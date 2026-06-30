@@ -73,4 +73,27 @@ class SeatLockController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Cancel the in-progress booking: release every hold the caller owns for this
+     * showtime. Each freed seat broadcasts `available`. Idempotent (200 with an
+     * empty list when nothing is held).
+     *
+     * @group Seat locks
+     *
+     * @urlParam showtime integer required The showtime id. Example: 1
+     *
+     * @response 200 {"data":{"showtime_id":1,"released":["C5","C6"]}}
+     */
+    public function destroyAll(Showtime $showtime, Request $request): JsonResponse
+    {
+        $released = $this->locks->releaseAll($showtime, $request->user());
+
+        return response()->json([
+            'data' => [
+                'showtime_id' => $showtime->id,
+                'released' => $released,
+            ],
+        ]);
+    }
 }

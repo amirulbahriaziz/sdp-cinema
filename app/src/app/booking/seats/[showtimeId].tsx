@@ -12,11 +12,12 @@
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeBack } from '@/lib/use-safe-back';
+import { useCancelBooking } from '@/lib/use-cancel-booking';
 import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 
 import { useLockSeat, useReleaseSeat, useSeatMap } from '@/api/hooks';
-import { PriceTotalBar, Screen, SeatLegend, SeatMap, StepHeader } from '@/components';
+import { PriceTotalBar, PrimaryButton, Screen, SeatLegend, SeatMap, StepHeader } from '@/components';
 import { isLiveSource } from '@/data';
 import type { Seat } from '@/data/types';
 import { useSeatChannel } from '@/realtime/use-seat-channel';
@@ -28,6 +29,7 @@ export default function SeatSelectionScreen() {
   const goBack = useSafeBack();
   const { showtimeId: param } = useLocalSearchParams<{ showtimeId: string }>();
   const showtimeId = Number(param);
+  const { cancel, cancelling } = useCancelBooking(showtimeId);
 
   const draftShowtimeId = useBookingStore((s) => s.showtimeId);
   const startBooking = useBookingStore((s) => s.startBooking);
@@ -79,17 +81,20 @@ export default function SeatSelectionScreen() {
       header={<StepHeader title="Select Seats" onBack={goBack} />}
       contentStyle={styles.content}
       footer={
-        <PriceTotalBar
-          label="Sub-total"
-          amount={subtotal}
-          currency={seatMap?.currency ?? 'RM'}
-          caption={
-            seats.length ? `${seats.length} seat${seats.length > 1 ? 's' : ''} selected` : 'No seats yet'
-          }
-          ctaLabel="Proceed"
-          disabled={seats.length === 0}
-          onPress={() => router.push(`/booking/food/${showtimeId}`)}
-        />
+        <View style={styles.footerCol}>
+          <PriceTotalBar
+            label="Sub-total"
+            amount={subtotal}
+            currency={seatMap?.currency ?? 'RM'}
+            caption={
+              seats.length ? `${seats.length} seat${seats.length > 1 ? 's' : ''} selected` : 'No seats yet'
+            }
+            ctaLabel="Proceed"
+            disabled={seats.length === 0}
+            onPress={() => router.push(`/booking/food/${showtimeId}`)}
+          />
+          <PrimaryButton variant="ghost" label="Cancel booking" loading={cancelling} onPress={cancel} />
+        </View>
       }>
       {isLoading ? (
         <ActivityIndicator color={colors.accent.primary} style={styles.loader} />
@@ -108,6 +113,7 @@ export default function SeatSelectionScreen() {
 }
 
 const styles = StyleSheet.create({
+  footerCol: { gap: space['2'] },
   content: { alignItems: 'center' },
   body: { gap: space['8'], alignItems: 'center', paddingTop: space['4'] },
   loader: { marginTop: space['12'] },

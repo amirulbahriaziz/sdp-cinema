@@ -6,6 +6,7 @@
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeBack } from '@/lib/use-safe-back';
+import { useCancelBooking } from '@/lib/use-cancel-booking';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -19,6 +20,7 @@ export default function BookingSummaryScreen() {
   const router = useRouter();
   const goBack = useSafeBack();
   const { showtimeId } = useLocalSearchParams<{ showtimeId: string }>();
+  const { cancel, cancelling } = useCancelBooking(Number(showtimeId));
 
   const showtime = useBookingStore((s) => s.showtime);
   const seats = useBookingStore((s) => s.seats);
@@ -51,11 +53,14 @@ export default function BookingSummaryScreen() {
     <Screen
       header={<StepHeader title="Booking Summary" onBack={goBack} />}
       footer={
-        <PrimaryButton
-          label="Proceed to Payment"
-          disabled={seats.length === 0}
-          onPress={() => router.push(`/booking/payment/${showtimeId}`)}
-        />
+        <View style={styles.footerCol}>
+          <PrimaryButton
+            label="Proceed to Payment"
+            disabled={seats.length === 0}
+            onPress={() => router.push(`/booking/payment/${showtimeId}`)}
+          />
+          <PrimaryButton variant="ghost" label="Cancel booking" loading={cancelling} onPress={cancel} />
+        </View>
       }>
       <View style={styles.content}>
         {/* Ticket card */}
@@ -139,6 +144,7 @@ function Row({ icon, value }: { icon: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
+  footerCol: { gap: space['2'] },
   content: { gap: space['4'], paddingTop: space['4'] },
   card: {
     padding: space['4'],

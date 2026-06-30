@@ -45,5 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/showtimes/{showtime}/seats/{seatCode}/lock', [SeatLockController::class, 'destroy'])
         ->whereNumber('showtime');
 
+    // Cancel the in-progress booking: release all of the caller's holds for the showtime.
+    Route::delete('/showtimes/{showtime}/holds', [SeatLockController::class, 'destroyAll'])
+        ->whereNumber('showtime');
+
     Route::post('/bookings', [BookingController::class, 'store']);
 });

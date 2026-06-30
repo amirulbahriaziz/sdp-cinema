@@ -218,6 +218,8 @@ export interface DataAdapter {
   getSeatMap(showtimeId: number): Promise<SeatMap>;
   lockSeat(showtimeId: number, seatCode: string): Promise<LockResult>;
   releaseSeat(showtimeId: number, seatCode: string): Promise<LockResult>;
+  /** Cancel the in-progress booking: release all of the caller's holds for the showtime. */
+  cancelHolds(showtimeId: number): Promise<{ released: string[] }>;
   getFoodItems(query?: FoodQuery): Promise<FoodItem[]>;
   createBooking(payload: BookingRequest): Promise<BookingResult>;
   login(email: string, password: string): Promise<AuthResult>;
