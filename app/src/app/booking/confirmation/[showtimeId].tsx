@@ -8,10 +8,10 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { ResultScreen, Screen, SummaryRow } from '@/components';
+import { InfoRow, ResultScreen, Screen, SummaryRow } from '@/components';
 import { formatDateShort, formatTime } from '@/lib/datetime';
 import { useBookingStore } from '@/store/booking';
-import { colors, formatMoney, radius, space, type as typeScale } from '@/theme';
+import { colors, formatMoney, space, surfaceCard, type as typeScale } from '@/theme';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
@@ -56,13 +56,13 @@ export default function ConfirmationScreen() {
         details={
           <View style={styles.ticket}>
             <Text style={styles.movie}>{showtime.movie.title}</Text>
-            <Row label="Cinema" value={`${showtime.cinema.name} · ${showtime.hall.name}`} />
-            <Row
+            <InfoRow label="Cinema" value={`${showtime.cinema.name} · ${showtime.hall.name}`} />
+            <InfoRow
               label="When"
               value={`${formatDateShort(showtime.starts_at)} · ${formatTime(showtime.starts_at)}`}
             />
-            <Row label="Seats" value={seatList || '—'} />
-            <Row label="Reference" value={result.reference} />
+            <InfoRow label="Seats" value={seatList || '—'} />
+            <InfoRow label="Reference" value={result.reference} />
             <View style={styles.divider} />
             <SummaryRow
               label={`Paid (${payment.method})`}
@@ -76,28 +76,9 @@ export default function ConfirmationScreen() {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  ticket: {
-    padding: space['4'],
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border.default,
-    gap: space['2'],
-  },
+  ticket: { ...surfaceCard(), padding: space['4'], gap: space['2'] },
   movie: { ...typeScale.title, color: colors.text.primary, marginBottom: space['1'] },
-  row: { flexDirection: 'row', gap: space['3'] },
-  rowLabel: { ...typeScale.caption, color: colors.text.muted, width: 72 },
-  rowValue: { ...typeScale.body, color: colors.text.primary, flex: 1 },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border.default,

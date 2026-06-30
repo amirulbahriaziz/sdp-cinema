@@ -6,24 +6,24 @@
  * minor units in RM.
  */
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
+import { useSafeBack } from '@/lib/use-safe-back';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useBooking } from '@/api/hooks';
-import { PrimaryButton, Screen, SummaryRow } from '@/components';
+import { InfoRow, PrimaryButton, Screen, SummaryRow } from '@/components';
 import { formatDateShort, formatTime } from '@/lib/datetime';
 import { useBookingStore } from '@/store/booking';
-import { colors, formatMoney, radius, space, type as typeScale } from '@/theme';
+import { colors, formatMoney, radius, space, surfaceCard, type as typeScale } from '@/theme';
 
 export default function TicketScreen() {
-  const router = useRouter();
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>();
   const id = Number(bookingId);
   const stored = useBookingStore((s) => s.result);
   const fromStore = stored?.id === id ? stored : undefined;
   const { data: result, isLoading } = useBooking(id, fromStore);
 
-  const back = () => (router.canGoBack() ? router.back() : router.replace('/'));
+  const back = useSafeBack();
 
   if (!result) {
     return (
@@ -57,12 +57,12 @@ export default function TicketScreen() {
         <View style={styles.ticket}>
           <View style={styles.stubTop}>
             <Text style={styles.movie}>{showtime.movie.title}</Text>
-            <Row label="Cinema" value={`${showtime.cinema.name} · ${showtime.hall.name}`} />
-            <Row
+            <InfoRow label="Cinema" value={`${showtime.cinema.name} · ${showtime.hall.name}`} />
+            <InfoRow
               label="When"
               value={`${formatDateShort(showtime.starts_at)} · ${formatTime(showtime.starts_at)}`}
             />
-            <Row label="Seats" value={seatList || '—'} />
+            <InfoRow label="Seats" value={seatList || '—'} />
           </View>
 
           <View style={styles.perforation}>
@@ -72,8 +72,8 @@ export default function TicketScreen() {
           </View>
 
           <View style={styles.stubBottom}>
-            <Row label="Reference" value={result.reference} mono />
-            <Row label="Status" value={payment.status} />
+            <InfoRow label="Reference" value={result.reference} mono />
+            <InfoRow label="Status" value={payment.status} />
           </View>
         </View>
 
@@ -111,15 +111,6 @@ function Header() {
   );
 }
 
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={[styles.rowValue, mono && styles.mono]}>{value}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
@@ -132,13 +123,7 @@ const styles = StyleSheet.create({
   content: { padding: space['4'], gap: space['4'] },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: space['2'], justifyContent: 'center' },
   statusText: { ...typeScale.bodyBold, color: colors.state.success, textTransform: 'capitalize' },
-  ticket: {
-    backgroundColor: colors.bg.surface,
-    borderRadius: radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border.default,
-    overflow: 'hidden',
-  },
+  ticket: { ...surfaceCard(radius.lg), overflow: 'hidden' },
   stubTop: { padding: space['4'], gap: space['2'] },
   stubBottom: { padding: space['4'], gap: space['2'] },
   movie: { ...typeScale.title, color: colors.text.primary, marginBottom: space['1'] },
@@ -153,18 +138,7 @@ const styles = StyleSheet.create({
   notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: colors.bg.base },
   notchLeft: { marginLeft: -10 },
   notchRight: { marginRight: -10 },
-  row: { flexDirection: 'row', gap: space['3'] },
-  rowLabel: { ...typeScale.caption, color: colors.text.muted, width: 80 },
-  rowValue: { ...typeScale.body, color: colors.text.primary, flex: 1 },
-  mono: { ...typeScale.bodyBold, letterSpacing: 1 },
-  breakdown: {
-    backgroundColor: colors.bg.surface,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border.default,
-    padding: space['4'],
-    gap: space['2'],
-  },
+  breakdown: { ...surfaceCard(), padding: space['4'], gap: space['2'] },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border.default,

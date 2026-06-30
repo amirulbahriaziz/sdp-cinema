@@ -6,21 +6,19 @@
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeBack } from '@/lib/use-safe-back';
-import { useCancelBooking } from '@/lib/use-cancel-booking';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useFoodItems, useMovie } from '@/api/hooks';
-import { PrimaryButton, Screen, StepHeader, SummaryRow } from '@/components';
+import { InfoRow, PrimaryButton, Screen, StepHeader, SummaryRow, WizardFooter } from '@/components';
 import { formatDateShort, formatTime } from '@/lib/datetime';
 import { useBookingStore, useBookingTotals } from '@/store/booking';
-import { colors, formatMoney, radius, space, type as typeScale } from '@/theme';
+import { colors, formatMoney, radius, space, surfaceCard, type as typeScale } from '@/theme';
 
 export default function BookingSummaryScreen() {
   const router = useRouter();
   const goBack = useSafeBack();
   const { showtimeId } = useLocalSearchParams<{ showtimeId: string }>();
-  const { cancel, cancelling } = useCancelBooking(Number(showtimeId));
 
   const showtime = useBookingStore((s) => s.showtime);
   const seats = useBookingStore((s) => s.seats);
@@ -53,14 +51,13 @@ export default function BookingSummaryScreen() {
     <Screen
       header={<StepHeader title="Booking Summary" onBack={goBack} />}
       footer={
-        <View style={styles.footerCol}>
+        <WizardFooter showtimeId={Number(showtimeId)}>
           <PrimaryButton
             label="Proceed to Payment"
             disabled={seats.length === 0}
             onPress={() => router.push(`/booking/payment/${showtimeId}`)}
           />
-          <PrimaryButton variant="ghost" label="Cancel booking" loading={cancelling} onPress={cancel} />
-        </View>
+        </WizardFooter>
       }>
       <View style={styles.content}>
         {/* Ticket card */}
@@ -68,15 +65,15 @@ export default function BookingSummaryScreen() {
           <Text style={styles.movie}>{movie?.title ?? 'Your Movie'}</Text>
           {showtime ? (
             <>
-              <Row icon="Cinema" value={`${showtime.cinema.name} · ${showtime.hall.name}`} />
-              <Row
-                icon="When"
+              <InfoRow label="Cinema" value={`${showtime.cinema.name} · ${showtime.hall.name}`} />
+              <InfoRow
+                label="When"
                 value={`${formatDateShort(showtime.starts_at)} · ${formatTime(showtime.starts_at)}`}
               />
-              <Row icon="Tier" value={showtime.tier.name} />
+              <InfoRow label="Tier" value={showtime.tier.name} />
             </>
           ) : null}
-          <Row icon="Seats" value={seats.map((s) => s.seat_code).join(', ') || '—'} />
+          <InfoRow label="Seats" value={seats.map((s) => s.seat_code).join(', ') || '—'} />
         </View>
 
         {/* Line items */}
@@ -134,30 +131,10 @@ export default function BookingSummaryScreen() {
   );
 }
 
-function Row({ icon, value }: { icon: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{icon}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  footerCol: { gap: space['2'] },
   content: { gap: space['4'], paddingTop: space['4'] },
-  card: {
-    padding: space['4'],
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border.default,
-    gap: space['2'],
-  },
+  card: { ...surfaceCard(), padding: space['4'], gap: space['2'] },
   movie: { ...typeScale.title, color: colors.text.primary, marginBottom: space['1'] },
-  row: { flexDirection: 'row', gap: space['3'] },
-  rowLabel: { ...typeScale.caption, color: colors.text.muted, width: 56 },
-  rowValue: { ...typeScale.body, color: colors.text.primary, flex: 1 },
   promoLabel: { ...typeScale.captionBold, color: colors.text.muted },
   promoRow: { flexDirection: 'row', gap: space['3'], alignItems: 'center' },
   promoInput: {

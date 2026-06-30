@@ -6,7 +6,7 @@
  * a hex value or a raw pixel. There is no light mode and no CSS — this is a plain JS object
  * consumed via `StyleSheet`/styled props.
  */
-import { Platform, type TextStyle } from 'react-native';
+import { Platform, StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
 
 export const colors = {
   bg: {
@@ -91,4 +91,14 @@ export function formatMoney(minor: number, currency = 'RM'): string {
   const major = Math.floor(abs / 100);
   const cents = (abs % 100).toString().padStart(2, '0');
   return `${sign}${currency} ${major}.${cents}`;
+}
+
+/** Standard dark surface card base (bg.surface + hairline border). Pass a radius (default md). */
+export function surfaceCard(r: number = radius.md): ViewStyle {
+  return {
+    backgroundColor: colors.bg.surface,
+    borderRadius: r,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border.default,
+  };
 }

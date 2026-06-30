@@ -12,7 +12,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { PriceTotalBar, Screen, StepHeader } from '@/components';
 import { useCheckout } from '@/lib/checkout';
 import { useBookingStore, useBookingTotals } from '@/store/booking';
-import { colors, radius, space, type as typeScale } from '@/theme';
+import { colors, radius, space, surfaceCard, type as typeScale } from '@/theme';
 
 /** Group digits into 4s for display: "4111111111111111" -> "4111 1111 1111 1111". */
 const formatCardNumber = (raw: string) =>
@@ -143,14 +143,7 @@ function Field({
 
 const styles = StyleSheet.create({
   content: { gap: space['4'], paddingTop: space['4'] },
-  card: {
-    padding: space['4'],
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border.default,
-    gap: space['4'],
-  },
+  card: { ...surfaceCard(), padding: space['4'], gap: space['4'] },
   row: { flexDirection: 'row', gap: space['3'] },
   half: { flex: 1 },
   field: { gap: space['2'] },

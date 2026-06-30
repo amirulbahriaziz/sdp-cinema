@@ -6,12 +6,11 @@
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeBack } from '@/lib/use-safe-back';
-import { useCancelBooking } from '@/lib/use-cancel-booking';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useFoodItems } from '@/api/hooks';
-import { FoodItemCard, PriceTotalBar, PrimaryButton, Screen, StepHeader, Tabs } from '@/components';
+import { FoodItemCard, PriceTotalBar, Screen, StepHeader, Tabs, WizardFooter } from '@/components';
 import type { FoodCategory } from '@/data/types';
 import { useBookingStore } from '@/store/booking';
 import { colors, space, type as typeScale } from '@/theme';
@@ -26,7 +25,6 @@ export default function FoodBeverageScreen() {
   const router = useRouter();
   const goBack = useSafeBack();
   const { showtimeId } = useLocalSearchParams<{ showtimeId: string }>();
-  const { cancel, cancelling } = useCancelBooking(Number(showtimeId));
   const [tab, setTab] = useState<FoodCategory>('combo');
 
   const food = useBookingStore((s) => s.food);
@@ -53,7 +51,7 @@ export default function FoodBeverageScreen() {
         />
       }
       footer={
-        <View style={styles.footerCol}>
+        <WizardFooter showtimeId={Number(showtimeId)}>
           <PriceTotalBar
             label="F&B Sub-total"
             amount={foodTotal}
@@ -61,8 +59,7 @@ export default function FoodBeverageScreen() {
             ctaLabel="Confirm"
             onPress={toSummary}
           />
-          <PrimaryButton variant="ghost" label="Cancel booking" loading={cancelling} onPress={cancel} />
-        </View>
+        </WizardFooter>
       }>
       <View style={styles.content}>
         <Tabs options={TABS} value={tab} onChange={setTab} />
@@ -89,7 +86,6 @@ export default function FoodBeverageScreen() {
 }
 
 const styles = StyleSheet.create({
-  footerCol: { gap: space['2'] },
   content: { gap: space['4'], paddingTop: space['4'] },
   list: { gap: space['3'] },
   loader: { marginTop: space['8'] },
