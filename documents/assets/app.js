@@ -11,6 +11,7 @@ const PAGES = [
   { slug: 'overview',       file: '01-overview.md',        title: 'Project Overview' },
   { slug: 'architecture',   file: '02-architecture.md',    title: 'Architecture & Diagrams' },
   { slug: 'data-flow',      file: '06-data-flow.md',       title: 'Data Flow' },
+  { slug: 'state',          file: '07-state-management.md', title: 'State & Components' },
   { slug: 'ui',             file: '03-ui.md',              title: 'UI Context' },
   { slug: 'code-standards', file: '04-code-standards.md',  title: 'Code Standards' },
   { slug: 'workflow',       file: '05-workflow.md',        title: 'AI Workflow Rules' },
