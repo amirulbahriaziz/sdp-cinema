@@ -1,14 +1,11 @@
 # SDP Cinema — Presentation Deck Outline
 
-Slide-by-slide content for the interview PPT, grounded in the actual build. Three parts:
-**Part A — the Cinema App**, **Part B — Mobile Development Lead (§4.2)**, **Part C — Application
-Development Manager (§4.5)**. Each `## Slide` = one slide; bullets = body.
-In **Part A**, every design section has a **"what"** slide followed by a separate **"Why"** slide
-(answering why we chose each thing — may span 2 pages). (§4.6 UI/UX hi-fi = separate Figma work.)
+Slide-by-slide content for the interview PPT, grounded in the actual build. Covers the
+**Cinema App** — the project plus the design decisions. Each design section has a **"what"** slide
+followed by a separate **"Why"** slide (answering why we chose each thing). Each `## Slide` = one
+slide; bullets = body.
 
----
-# PART A — The Cinema App
----
+# The Cinema App
 
 ## Slide A1 — Title
 - **SDP Cinema** — Online Cinema Booking App
@@ -85,73 +82,3 @@ In **Part A**, every design section has a **"what"** slide followed by a separat
 - **Why Zustand (client state)** — booking draft is *user intent*, not server data; Zustand is minimal,
   selector-based, no provider tree (`useShallow` for derived totals). **Not** Redux (boilerplate) /
   Context-everywhere (whole-tree re-renders)
-
----
-# PART B — Mobile Development Lead (§4.2)
----
-
-## Slide B1 — Scope note
-- Architecture, state management, API & data-fetch strategy → **covered in Part A**
-- This part: **performance · cross-platform · Android UI/UX · risks**
-
-## Slide B2 — Performance optimization
-- **Rendering**: `FlatList` virtualization; kill re-render storms with Zustand **selectors + `useShallow`**
-  (fixed a real "Maximum update depth" loop this way)
-- **Hermes** engine (Expo default) — fast cold start, low memory; precompiled bytecode, no JIT cost
-- **Lazy loading**: Expo Router loads route bundles on navigation; `expo-image` for posters
-- **Bottlenecks**: bloated re-renders → memo/selectors; big seat grid → keyed cells; network → RQ cache + `staleTime`
-
-## Slide B3 — Cross-platform strategy
-- One codebase; **platform-specific only where needed**: `Platform.OS`, `*.web.tsx`, `Platform.select`
-- Concrete: Cancel uses native `Alert` vs web `window.confirm`; realtime needs the `netinfo` native dep
-- iOS/Android-only features → isolate behind a hook/component; no-op or alternative on the other side
-
-## Slide B4 — UI/UX: Android fragmentation
-- **Density-independent layout**: flex + safe-area context, no hardcoded pixels
-- **Theme tokens** (`theme.ts`) — one source for color / spacing / radius / type
-- Responsive seat grid + scroll; tested across simulator sizes + a physical device
-- Accessibility: roles/labels on pressables, hit-slop on small targets
-
-## Slide B5 — Risks & mitigations (from experience)
-- **Seat-lock race** → DB unique index arbitrates (not app code) → 409
-- **Realtime outage** → best-effort broadcast + **polling fallback**
-- **Abandoned holds** → TTL auto-expiry
-- **API/app contract drift** → typed contract; align resources (hit + fixed several this build)
-- **Scale** → stateless API (horizontal) + separate WS tier
-
----
-# PART C — Application Development Manager (§4.5)
----
-
-## Slide C1 — Monolith vs microservices
-- **Recommend: modular monolith** (Laravel) for this scope
-- Why: single domain, small team, faster delivery, local transactions, simpler ops
-- Realtime (Reverb) already a **separate tier**; extract payments/notifications/catalog later **if** load/teams demand
-
-## Slide C2 — Tech proposal + rationale (manager lens)
-- **Backend** Laravel 12 · **Mobile** React Native/Expo (hybrid, one codebase) · **DB** MySQL · **Realtime** Reverb
-- Per-choice rationale → Part A; trade-offs acknowledged (Django / Flutter / native viable)
-- Optimizes realtime + delivery speed + team fit
-
-## Slide C3 — Cloud & infrastructure
-- **API**: container/VM or serverless (stateless REST scales well)
-- **Realtime**: an **always-on instance** — WebSocket needs a persistent process (poor serverless fit)
-- **Services**: managed MySQL · object storage + CDN (posters) · TLS
-- **VM vs serverless → hybrid**: serverless/containers for API, always-on for WS
-
-## Slide C4 — Data model (ERD)
-- Paste the **Mermaid ERD** (from `documents/` Architecture page)
-- Core: movies · cinemas · halls · seats · price_tiers · seat_type_prices · showtimes ·
-  **seat_locks** (transient hold) · bookings · booking_seats (sold) · booking_food_items · payments
-- Key: status derived per (showtime×seat); hold→sold = the two-table FCFS mechanism
-
-## Slide C5 — Headcount, cost & timeline (indicative)
-- **Team**: 1 BE (Laravel) · 1 Mobile (RN) · 0.5 UI/UX · 0.5 QA · 0.5 PM/Lead
-- **Timeline (~8–10 wks)**: design/ERD/contract (1–2) · build API+app (3–6) · realtime+integrate (7) ·
-  hardening/test (8) · UAT + store submission (9–10)
-- **Cost drivers**: team (bulk) · modest cloud (1 API + 1 DB + 1 WS) · app-store fees
-
-## Slide C6 — Summary
-- Met §1.0: real-time FCFS seat locking, end to end
-- Stateless API · component-based app · practical state management · realtime + fallback
-- Clear scale path: modular monolith → extract; stateless API; separate WS tier
