@@ -1,0 +1,48 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Venom: The Last Dance",
+      "poster_url": "https://image.tmdb.org/t/p/w500/aosm8NMQ3UyoBVpSxyimorCQykC.jpg",
+      "age_rating": "P13",
+      "imdb_rating": 7.1,
+      "duration_min": 109,
+      "release_date": "2026-06-12",
+      "genres": ["Action", "Sci-Fi", "Adventure"],
+      "sections": ["new_releases", "popular"]
+    },
+    {
+      "id": 2,
+      "title": "Dune: Part Two",
+      "poster_url": "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+      "age_rating": "P13",
+      "imdb_rating": 8.5,
+      "duration_min": 166,
+      "release_date": "2026-05-28",
+      "genres": ["Sci-Fi", "Drama", "Adventure"],
+      "sections": ["popular", "recommended"]
+    },
+    {
+      "id": 3,
+      "title": "Inside Out 2",
+      "poster_url": "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",
+      "age_rating": "U",
+      "imdb_rating": 7.6,
+      "duration_min": 96,
+      "release_date": "2026-06-19",
+      "genres": ["Animation", "Family", "Comedy"],
+      "sections": ["new_releases", "recommended"]
+    },
+    {
+      "id": 4,
+      "title": "The Batman: Shadows",
+      "poster_url": "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+      "age_rating": "18",
+      "imdb_rating": 7.9,
+      "duration_min": 142,
+      "release_date": "2026-06-05",
+      "genres": ["Action", "Crime", "Thriller"],
+      "sections": ["popular"]
+    }
+  ]
+}

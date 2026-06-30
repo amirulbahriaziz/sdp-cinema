@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "TGV Suria KLCC",
+      "city": "Kuala Lumpur",
+      "address": "Level 3, Suria KLCC, Kuala Lumpur City Centre, 50088 Kuala Lumpur",
+      "halls": [
+        { "id": 1, "name": "Hall 1" }
+      ]
+    }
+  ]
+}

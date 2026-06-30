@@ -1,0 +1,10 @@
+{
+  "data": {
+    "showtime_id": 1,
+    "seat_code": "D4",
+    "status": "held",
+    "holder": "you",
+    "expires_at": "2026-07-02T19:05:00+08:00",
+    "ttl_seconds": 300
+  }
+}

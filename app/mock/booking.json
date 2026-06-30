@@ -1,0 +1,36 @@
+{
+  "data": {
+    "id": 501,
+    "reference": "SDP-2026-000501",
+    "status": "confirmed",
+    "currency": "RM",
+    "showtime": {
+      "id": 1,
+      "starts_at": "2026-07-02T19:30:00+08:00",
+      "movie": { "id": 1, "title": "Venom: The Last Dance" },
+      "cinema": { "id": 1, "name": "TGV Suria KLCC" },
+      "hall": { "id": 1, "name": "Hall 1" }
+    },
+    "seats": [
+      { "seat_code": "D4", "type": "standard", "unit_price": 1800 },
+      { "seat_code": "D5", "type": "standard", "unit_price": 1800 }
+    ],
+    "food": [
+      { "food_item_id": 1, "name": "Sweet Couple Combo", "qty": 1, "unit_price": 3200, "line_total": 3200 },
+      { "food_item_id": 7, "name": "Regular Coke", "qty": 2, "unit_price": 850, "line_total": 1700 }
+    ],
+    "subtotal": 3600,
+    "food_total": 4900,
+    "service_charge": 425,
+    "promo_code": "WELCOME10",
+    "discount": 360,
+    "total": 8565,
+    "payment": {
+      "method": "card",
+      "amount": 8565,
+      "currency": "RM",
+      "status": "paid",
+      "reference": "PAY-000501"
+    }
+  }
+}

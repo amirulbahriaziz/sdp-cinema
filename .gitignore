@@ -3,3 +3,4 @@ api/node_modules/
 app/node_modules/
 .env
 *.log
+app/dist/

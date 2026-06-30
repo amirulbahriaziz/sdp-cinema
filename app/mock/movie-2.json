@@ -1,0 +1,40 @@
+{
+  "data": {
+    "id": 2,
+    "title": "Dune: Part Two",
+    "synopsis": "Paul Atreides unites with the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he endeavors to prevent a terrible future.",
+    "duration_min": 166,
+    "release_date": "2026-05-28",
+    "age_rating": "P13",
+    "imdb_rating": 8.5,
+    "poster_url": "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+    "trailer_url": "https://www.youtube.com/watch?v=Way9Dexny3w",
+    "genres": ["Sci-Fi", "Drama", "Adventure"],
+    "director": "Denis Villeneuve",
+    "casts": ["Timothée Chalamet", "Zendaya", "Rebecca Ferguson", "Javier Bardem"],
+    "writers": ["Denis Villeneuve", "Jon Spaihts"],
+    "rating_summary": {
+      "average": 4.6,
+      "count": 204,
+      "breakdown": { "5": 150, "4": 38, "3": 10, "2": 4, "1": 2 }
+    },
+    "reviews": [
+      {
+        "id": 20,
+        "user_name": "Hafiz Nordin",
+        "rating": 5,
+        "title": "A masterpiece",
+        "body": "Visually stunning and emotionally gripping. Worth every ringgit on the big screen.",
+        "created_at": "2026-06-01T20:00:00+08:00"
+      },
+      {
+        "id": 21,
+        "user_name": "Mei Ling",
+        "rating": 5,
+        "title": "Better than Part One",
+        "body": "The pacing and the worm-riding scene gave me chills. See it in IMAX if you can.",
+        "created_at": "2026-06-03T11:45:00+08:00"
+      }
+    ]
+  }
+}
