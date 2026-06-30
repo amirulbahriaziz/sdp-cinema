@@ -22,4 +22,6 @@ export const queryKeys = {
   showtimes: (q?: unknown) => ['showtimes', q ?? null] as const,
   seatMap: (showtimeId: number) => ['seatMap', showtimeId] as const,
   foodItems: (q?: unknown) => ['foodItems', q ?? null] as const,
+  bookings: () => ['bookings'] as const,
+  booking: (id: number) => ['booking', id] as const,
 };

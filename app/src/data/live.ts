@@ -109,6 +109,16 @@ export const liveAdapter: DataAdapter = {
     return res.data.data;
   },
 
+  async getBookings() {
+    const res = await http.get<{ data: BookingResult[] }>('/bookings');
+    return res.data.data;
+  },
+
+  async getBooking(id: number) {
+    const res = await http.get<{ data: BookingResult }>(`/bookings/${id}`);
+    return res.data.data;
+  },
+
   async login(email: string, password: string) {
     const res = await http.post<{ data: AuthResult }>('/auth/login', { email, password });
     return res.data.data;

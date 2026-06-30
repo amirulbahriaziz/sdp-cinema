@@ -222,6 +222,10 @@ export interface DataAdapter {
   cancelHolds(showtimeId: number): Promise<{ released: string[] }>;
   getFoodItems(query?: FoodQuery): Promise<FoodItem[]>;
   createBooking(payload: BookingRequest): Promise<BookingResult>;
+  /** The caller's bookings (My Tickets), newest first. */
+  getBookings(): Promise<BookingResult[]>;
+  /** One booking (the ticket/receipt) by id. */
+  getBooking(id: number): Promise<BookingResult>;
   login(email: string, password: string): Promise<AuthResult>;
   register(input: {
     name: string;

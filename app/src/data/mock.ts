@@ -129,6 +129,14 @@ export const mockAdapter: DataAdapter = {
     });
   },
 
+  getBookings(): Promise<BookingResult[]> {
+    return delay([]);
+  },
+
+  getBooking(): Promise<BookingResult> {
+    return Promise.reject(new Error('Bookings are not available in mock mode.'));
+  },
+
   login() {
     return delay(AUTH);
   },

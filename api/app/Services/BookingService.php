@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\SeatLock;
 use App\Models\Showtime;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,25 @@ class BookingService
     ];
 
     public function __construct(private readonly SeatMapService $seatMap) {}
+
+    /** Relations BookingResource needs, for list + detail reads. */
+    private const WITH = ['showtime.movie', 'showtime.hall.cinema', 'seats.seat', 'foodItems.foodItem', 'payment'];
+
+    /** All of a user's bookings, newest first. */
+    public function listForUser(User $user): Collection
+    {
+        return Booking::query()
+            ->where('user_id', $user->id)
+            ->with(self::WITH)
+            ->latest()
+            ->get();
+    }
+
+    /** Load a single booking's relations for BookingResource. */
+    public function loadDetail(Booking $booking): Booking
+    {
+        return $booking->load(self::WITH);
+    }
 
     /**
      * Confirm a booking for the caller.

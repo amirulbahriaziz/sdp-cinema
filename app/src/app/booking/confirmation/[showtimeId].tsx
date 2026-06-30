@@ -46,7 +46,11 @@ export default function ConfirmationScreen() {
         title="Congratulations!"
         message={`Your booking is confirmed. Reference ${result.reference}.`}
         actions={[
-          { label: 'View ticket', onPress: goHome, variant: 'primary' },
+          {
+            label: 'View ticket',
+            onPress: () => router.push(`/booking/ticket/${result.id}`),
+            variant: 'primary',
+          },
           { label: 'Main menu', onPress: goHome, variant: 'ghost' },
         ]}
         details={

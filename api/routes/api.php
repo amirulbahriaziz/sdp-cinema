@@ -50,4 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->whereNumber('showtime');
 
     Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->whereNumber('booking');
 });

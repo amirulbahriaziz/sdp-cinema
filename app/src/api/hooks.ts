@@ -15,6 +15,7 @@ import {
 import { data } from '../data';
 import type {
   BookingRequest,
+  BookingResult,
   FoodQuery,
   MovieQuery,
   ShowtimeQuery,
@@ -99,5 +100,20 @@ export function useCancelHolds(showtimeId: number) {
 export function useCreateBooking() {
   return useMutation({
     mutationFn: (payload: BookingRequest) => data.createBooking(payload),
+  });
+}
+
+/** My Tickets — the caller's bookings, newest first. */
+export function useBookings() {
+  return useQuery({ queryKey: queryKeys.bookings(), queryFn: () => data.getBookings() });
+}
+
+/** One booking (the ticket). `initialData` shows the just-made booking instantly. */
+export function useBooking(id: number, initialData?: BookingResult) {
+  return useQuery({
+    queryKey: queryKeys.booking(id),
+    queryFn: () => data.getBooking(id),
+    enabled: id > 0,
+    initialData,
   });
 }

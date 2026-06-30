@@ -319,4 +319,28 @@ class SeatLockBookingTest extends TestCase
         $this->deleteJson("/api/showtimes/{$this->showtime->id}/holds")
             ->assertStatus(401);
     }
+
+    public function test_user_lists_and_views_only_their_own_bookings(): void
+    {
+        $alice = User::factory()->create();
+        $bob = User::factory()->create();
+        $st = $this->showtime->id;
+
+        Sanctum::actingAs($alice);
+        $this->postJson("/api/showtimes/{$st}/seats/D4/lock")->assertStatus(201);
+        $bookingId = $this->postJson('/api/bookings', [
+            'showtime_id' => $st, 'seat_codes' => ['D4'], 'payment_method' => 'card',
+        ])->assertStatus(201)->json('data.id');
+
+        // Alice sees her booking in the list and can view it.
+        $this->getJson('/api/bookings')->assertStatus(200)->assertJsonCount(1, 'data');
+        $this->getJson("/api/bookings/{$bookingId}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.id', $bookingId);
+
+        // Bob has none and cannot view Alice's.
+        Sanctum::actingAs($bob);
+        $this->getJson('/api/bookings')->assertStatus(200)->assertJsonCount(0, 'data');
+        $this->getJson("/api/bookings/{$bookingId}")->assertStatus(403);
+    }
 }
