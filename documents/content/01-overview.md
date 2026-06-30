@@ -4,7 +4,7 @@
 
 An online cinema booking app whose defining feature is **real-time, first-come-first-serve seat
 locking**: the instant one user starts booking a seat, every other user viewing that hall's seating
-plan sees the seat lock and can no longer take it. Built as an interview assignment (Sime Property)
+plan sees the seat lock and can no longer take it. Built as an interview assignment (a property developer)
 covering multiple role tracks — a Laravel API, a React Native (Expo) mobile client, and supporting
 architecture/UX docs. The product is a movie-discovery + ticket + food-and-beverage purchase flow
 ending in a confirmed booking.
